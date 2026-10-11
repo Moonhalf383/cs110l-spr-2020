@@ -35,6 +35,49 @@ fn main() {
     let secret_word_chars: Vec<char> = secret_word.chars().collect();
     // Uncomment for debugging:
     // println!("random word: {}", secret_word);
-
+    let mut word_so_far = vec!['-'; secret_word.len()];
+    let mut guessed_letters: Vec<char> = Vec::new();
+    let mut lefted_guesses = NUM_INCORRECT_GUESSES;
     // Your code here! :)
+    println!("Welcome to CS110L Hangman!");
+    loop {
+        println!(
+            "The word so far is {}",
+            word_so_far.iter().collect::<String>()
+        );
+        println!(
+            "You have guessed the following letters: {}",
+            guessed_letters.iter().collect::<String>()
+        );
+        println!("You have {} guesses left", lefted_guesses);
+        print!("Please guess a letter: ");
+        io::stdout().flush().expect("Error flushing stdout.");
+        let mut guess = String::new();
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Error reading line.");
+        let c = guess.chars().next().unwrap();
+        guessed_letters.push(c);
+        let mut unchanged = true;
+        for (tc, ptr) in secret_word_chars.iter().zip(word_so_far.iter_mut()) {
+            if *ptr == '-' && c == *tc {
+                unchanged = false;
+                *ptr = c;
+                break;
+            }
+        }
+        if unchanged {
+            println!("Sorry, that letter is not in the word");
+            lefted_guesses -= 1;
+        } else if word_so_far == secret_word_chars {
+            println!("You win!");
+            break;
+        }
+
+        if lefted_guesses == 0 {
+            println!("\nSorry, you ran out of guesses!");
+            break;
+        }
+        println!("");
+    }
 }
